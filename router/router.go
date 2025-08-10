@@ -30,8 +30,7 @@ func (router *Router[T]) Get(path string) (T, bool) {
 }
 
 func getSegment(route string) (string, string) {
-	segment := strings.TrimLeftFunc(route, func(r rune) bool { return r != '/' })
-	rest := strings.TrimPrefix(route, segment)
+	segment, rest, _ := strings.Cut(strings.TrimPrefix(route, "/"), "/")
 	return segment, rest
 }
 
