@@ -15,26 +15,46 @@ func New[T any]() *Router[T] {
 }
 
 type GetResult[T any] struct {
-	Value T
-	Found bool
+	Value  T
+	Found  bool
+	Params map[string]string
+}
+
+type GetLookup[T any] struct {
+	path   string
+	params []string
 }
 
 func (router *Router[T]) Get(path string) *GetResult[T] {
-	if isIndexRoute(path) {
+	return router.get(&GetLookup[T]{path, []string{}})
+}
+
+func newGetResultSuccess[T any](value T, paramNames []string, paramValues []string) *GetResult[T] {
+	params := map[string]string{}
+	for i, name := range paramNames {
+		params[name] = paramValues[i]
+	}
+	return &GetResult[T]{value, true, params}
+}
+
+func (router *Router[T]) get(lookup *GetLookup[T]) *GetResult[T] {
+	if isIndexRoute(lookup.path) {
 		if router.index == nil {
 			return &GetResult[T]{Found: false}
 		}
-		return &GetResult[T]{router.index.value, true}
+		return newGetResultSuccess(router.index.value, router.index.paramNames, lookup.params)
 	}
-	segment, rest := getSegment(path)
+	segment, rest := getSegment(lookup.path)
 	child, ok := router.children[segment]
+	lookup.path = rest
 	if !ok {
 		if router.paramRouter == nil {
 			return &GetResult[T]{Found: false}
 		}
-		return router.paramRouter.Get(rest)
+		lookup.params = append(lookup.params, segment)
+		return router.paramRouter.get(lookup)
 	}
-	return child.Get(rest)
+	return child.get(lookup)
 }
 
 func getSegment(route string) (string, string) {

@@ -86,3 +86,42 @@ func TestParamRoutes(t *testing.T) {
 		}
 	}
 }
+
+var paramRouteValues = []struct {
+	route  string
+	path   string
+	values map[string]string
+}{
+	{"/profile/$profile/followers/$follower", "/profile/user-0/followers/user-1", map[string]string{
+		"profile":  "user-0",
+		"follower": "user-1",
+	}},
+	{"/profile/$admin/privileges", "/profile/main-man/privileges", map[string]string{
+		"admin": "main-man",
+	}},
+}
+
+func TestParamRouteValues(t *testing.T) {
+	router := New[int]()
+	for _, test := range paramRouteValues {
+		router.Set(test.route, 0)
+	}
+	for _, test := range paramRouteValues {
+		result := router.Get(test.path)
+		if !result.Found {
+			t.Errorf("failed to match %s to %s\n", test.path, test.route)
+			continue
+		}
+		for key, expectedValue := range result.Params {
+			value, ok := result.Params[key]
+			if !ok {
+				t.Errorf("missing param %s from route %s using path %s\n", key, test.route, test.path)
+				continue
+			}
+			if value != expectedValue {
+				t.Errorf("expected param %s to be %s for path %s on route %s but got %s instead\n", key, expectedValue, test.path, test.route, value)
+				continue
+			}
+		}
+	}
+}
