@@ -99,6 +99,16 @@ var paramRouteValues = []struct {
 	{"/profile/$admin/privileges", "/profile/main-man/privileges", map[string]string{
 		"admin": "main-man",
 	}},
+	{"/profile/$seller/store/$product/checkout", "/profile/gadgets296/store/linux-laptop/checkout", map[string]string{
+		"seller":  "gadgets296",
+		"product": "linux-laptop",
+	}},
+	{"/$id/view", "/3298305623543267/view", map[string]string{
+		"id": "3298305623543267",
+	}},
+	{"/users/$userId", "/users/john", map[string]string{
+		"userId": "john",
+	}},
 }
 
 func TestParamRouteValues(t *testing.T) {
