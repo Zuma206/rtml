@@ -14,7 +14,19 @@ func New[T any]() *Router[T] {
 }
 
 func (router *Router[T]) Get(path string) (T, bool) {
-	panic("TODO")
+	var zero T
+	if isIndexRoute(path) {
+		if router.index == nil {
+			return zero, false
+		}
+		return *router.index, true
+	}
+	segment, rest := getSegment(path)
+	child, ok := router.children[segment]
+	if !ok {
+		return zero, false
+	}
+	return child.Get(rest)
 }
 
 func getSegment(route string) (string, string) {
