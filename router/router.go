@@ -3,8 +3,9 @@ package router
 import "strings"
 
 type Router[T any] struct {
-	children map[string]*Router[T]
-	index    *T
+	children    map[string]*Router[T]
+	paramRouter *Router[T]
+	index       *T
 }
 
 func New[T any]() *Router[T] {
@@ -24,7 +25,10 @@ func (router *Router[T]) Get(path string) (T, bool) {
 	segment, rest := getSegment(path)
 	child, ok := router.children[segment]
 	if !ok {
-		return zero, false
+		if router.paramRouter == nil {
+			return zero, false
+		}
+		return router.paramRouter.Get(rest)
 	}
 	return child.Get(rest)
 }
@@ -53,5 +57,12 @@ func (router *Router[T]) Set(route string, value T) {
 		return
 	}
 	segment, rest := getSegment(route)
+	if _, isParam := strings.CutPrefix(segment, "$"); isParam {
+		if router.paramRouter == nil {
+			router.paramRouter = New[T]()
+		}
+		router.paramRouter.Set(rest, value)
+		return
+	}
 	router.getChild(segment).Set(rest, value)
 }
