@@ -10,6 +10,7 @@ var staticRoutes = []string{
 	"/test",
 	"/a-path",
 	"/a-path/another",
+	"/a-path/thing",
 }
 
 var paramRoutes = map[string]struct {
