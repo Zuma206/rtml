@@ -52,7 +52,7 @@ func TestStaticRoutes(t *testing.T) {
 	router := newTestRouter()
 	// Test all routes
 	for expectedIndex, route := range staticRoutes {
-		if index, ok := router.Get(route); !ok || index != strconv.Itoa(expectedIndex) {
+		if result := router.Get(route); !result.Found || result.Value != strconv.Itoa(expectedIndex) {
 			t.Errorf("failed to match route %s", route)
 		}
 	}
@@ -69,8 +69,8 @@ var notFoundRoutes = []string{
 func TestRouterFailure(t *testing.T) {
 	router := newTestRouter()
 	for _, route := range notFoundRoutes {
-		_, ok := router.Get(route)
-		if ok {
+		result := router.Get(route)
+		if result.Found {
 			t.Errorf("router unexpectedly matched %s", route)
 		}
 	}
@@ -80,7 +80,7 @@ func TestParamRoutes(t *testing.T) {
 	router := newTestRouter()
 	for expectedIndex, routeInfo := range paramRoutes {
 		for _, test := range routeInfo.tests {
-			if index, ok := router.Get(test); !ok || index != expectedIndex {
+			if result := router.Get(test); !result.Found || result.Value != expectedIndex {
 				t.Errorf("failed to match %s to param route %s", test, routeInfo.route)
 			}
 		}

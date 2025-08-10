@@ -14,19 +14,23 @@ func New[T any]() *Router[T] {
 	}
 }
 
-func (router *Router[T]) Get(path string) (T, bool) {
-	var zero T
+type GetResult[T any] struct {
+	Value T
+	Found bool
+}
+
+func (router *Router[T]) Get(path string) *GetResult[T] {
 	if isIndexRoute(path) {
 		if router.index == nil {
-			return zero, false
+			return &GetResult[T]{Found: false}
 		}
-		return *router.index, true
+		return &GetResult[T]{*router.index, true}
 	}
 	segment, rest := getSegment(path)
 	child, ok := router.children[segment]
 	if !ok {
 		if router.paramRouter == nil {
-			return zero, false
+			return &GetResult[T]{Found: false}
 		}
 		return router.paramRouter.Get(rest)
 	}
