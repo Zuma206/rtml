@@ -56,12 +56,13 @@ func (router *Router[T]) getChild(segment string) *Router[T] {
 }
 
 type SetPair[T any] struct {
-	route string
-	value T
+	route      string
+	value      T
+	paramNames []string
 }
 
 func (router *Router[T]) Set(route string, value T) {
-	router.set(&SetPair[T]{route, value})
+	router.set(&SetPair[T]{route, value, []string{}})
 }
 
 func (router *Router[T]) set(setPair *SetPair[T]) {
@@ -71,10 +72,11 @@ func (router *Router[T]) set(setPair *SetPair[T]) {
 	}
 	segment, rest := getSegment(setPair.route)
 	setPair.route = rest
-	if _, isParam := strings.CutPrefix(segment, "$"); isParam {
+	if paramName, isParam := strings.CutPrefix(segment, "$"); isParam {
 		if router.paramRouter == nil {
 			router.paramRouter = New[T]()
 		}
+		setPair.paramNames = append(setPair.paramNames, paramName)
 		router.paramRouter.set(setPair)
 		return
 	}
