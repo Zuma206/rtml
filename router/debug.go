@@ -9,12 +9,17 @@ func Print[T any](router *Router[T]) {
 func printDepth[T any](router *Router[T], depth int) {
 	if router.index != nil {
 		printMargin(depth)
-		println("<leaf>")
+		println("termination")
 	}
 	for key, child := range router.children {
 		printMargin(depth)
 		fmt.Printf("\"%s\"\n", key)
 		printDepth(child, depth+1)
+	}
+	if router.paramRouter != nil {
+		printMargin(depth)
+		println("catch-all param")
+		printDepth(router.paramRouter, depth+1)
 	}
 }
 
