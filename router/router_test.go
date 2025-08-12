@@ -35,7 +35,7 @@ var paramRoutes = map[string]struct {
 	}},
 }
 
-func newTestRouter() *Router[string] {
+func newTestRouter() Router[string] {
 	// Register all routes
 	router := New[string]()
 	for index, route := range staticRoutes {
