@@ -3,6 +3,7 @@ package fsrouter
 import (
 	"os"
 	"path"
+	"strings"
 
 	"github.com/zuma206/rtml/router"
 )
@@ -26,7 +27,7 @@ func (router *FSRouter) scanDir(dirPath string, prefix string) error {
 	}
 	for _, entry := range entries {
 		itemPath := path.Join(dirPath, entry.Name())
-		route := path.Join(prefix, entry.Name())
+		route := path.Join(prefix, processEntryName(entry.Name()))
 		if entry.IsDir() {
 			if err := router.scanDir(itemPath, route); err != nil {
 				return err
@@ -36,4 +37,11 @@ func (router *FSRouter) scanDir(dirPath string, prefix string) error {
 		router.Set(route, itemPath)
 	}
 	return nil
+}
+
+func processEntryName(entryName string) string {
+	if entryName == "index.html" {
+		entryName = ""
+	}
+	return strings.TrimSuffix(entryName, ".html")
 }
