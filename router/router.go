@@ -2,15 +2,20 @@ package router
 
 import "strings"
 
-type Router[T any] struct {
-	children    map[string]*Router[T]
-	paramRouter *Router[T]
+type Router[T any] interface {
+	Get(path string) *GetResult[T]
+	Set(route string, value T)
+}
+
+type SegmentRouter[T any] struct {
+	children    map[string]*SegmentRouter[T]
+	paramRouter *SegmentRouter[T]
 	index       *SetPair[T]
 }
 
-func New[T any]() *Router[T] {
-	return &Router[T]{
-		children: map[string]*Router[T]{},
+func New[T any]() *SegmentRouter[T] {
+	return &SegmentRouter[T]{
+		children: map[string]*SegmentRouter[T]{},
 	}
 }
 
@@ -25,7 +30,7 @@ type GetLookup[T any] struct {
 	params []string
 }
 
-func (router *Router[T]) Get(path string) *GetResult[T] {
+func (router *SegmentRouter[T]) Get(path string) *GetResult[T] {
 	return router.get(&GetLookup[T]{path, []string{}})
 }
 
@@ -37,7 +42,7 @@ func newGetResultSuccess[T any](value T, paramNames []string, paramValues []stri
 	return &GetResult[T]{value, true, params}
 }
 
-func (router *Router[T]) get(lookup *GetLookup[T]) *GetResult[T] {
+func (router *SegmentRouter[T]) get(lookup *GetLookup[T]) *GetResult[T] {
 	if isIndexRoute(lookup.path) {
 		if router.index == nil {
 			return &GetResult[T]{Found: false}
@@ -66,7 +71,7 @@ func isIndexRoute(path string) bool {
 	return path == "/" || path == ""
 }
 
-func (router *Router[T]) getChild(segment string) *Router[T] {
+func (router *SegmentRouter[T]) getChild(segment string) *SegmentRouter[T] {
 	child, ok := router.children[segment]
 	if !ok {
 		router.children[segment] = New[T]()
@@ -81,11 +86,11 @@ type SetPair[T any] struct {
 	paramNames []string
 }
 
-func (router *Router[T]) Set(route string, value T) {
+func (router *SegmentRouter[T]) Set(route string, value T) {
 	router.set(&SetPair[T]{route, value, []string{}})
 }
 
-func (router *Router[T]) set(setPair *SetPair[T]) {
+func (router *SegmentRouter[T]) set(setPair *SetPair[T]) {
 	if isIndexRoute(setPair.route) {
 		router.index = setPair
 		return

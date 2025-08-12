@@ -2,11 +2,11 @@ package router
 
 import "fmt"
 
-func Print[T any](router *Router[T]) {
-	printDepth(router, 0)
+func PrintSegmentRouter[T any](router *SegmentRouter[T]) {
+	printSegmentRouterAtDepth(router, 0)
 }
 
-func printDepth[T any](router *Router[T], depth int) {
+func printSegmentRouterAtDepth[T any](router *SegmentRouter[T], depth int) {
 	if router.index != nil {
 		printMargin(depth)
 		println("termination")
@@ -14,12 +14,12 @@ func printDepth[T any](router *Router[T], depth int) {
 	for key, child := range router.children {
 		printMargin(depth)
 		fmt.Printf("\"%s\"\n", key)
-		printDepth(child, depth+1)
+		printSegmentRouterAtDepth(child, depth+1)
 	}
 	if router.paramRouter != nil {
 		printMargin(depth)
 		println("catch-all param")
-		printDepth(router.paramRouter, depth+1)
+		printSegmentRouterAtDepth(router.paramRouter, depth+1)
 	}
 }
 

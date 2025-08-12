@@ -8,7 +8,7 @@ import (
 )
 
 type FSRouter struct {
-	*router.Router[string]
+	*router.SegmentRouter[string]
 }
 
 func New() *FSRouter {
