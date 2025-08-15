@@ -2,12 +2,14 @@ package utils
 
 import (
 	"fmt"
+	"io"
 	"os"
 )
 
-func HandleError(err error) {
-	if err != nil {
-		fmt.Printf("error: %s", err.Error())
-		os.Exit(1)
-	}
+func FprintError(w io.Writer, err error) {
+	fmt.Fprintf(w, "error: %s\n", err.Error())
+}
+
+func PrintError(err error) {
+	FprintError(os.Stderr, err)
 }
