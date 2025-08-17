@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/dop251/goja"
+	"github.com/zuma206/rtml/stdlib"
 	"golang.org/x/net/html"
 )
 
@@ -14,9 +15,11 @@ type Runtime struct {
 }
 
 func New() *Runtime {
-	return &Runtime{
+	runtime := &Runtime{
 		vm: goja.New(),
 	}
+	stdlib.OpenStdlib(runtime.vm)
+	return runtime
 }
 
 func (runtime *Runtime) RunCode(code io.Reader) error {
