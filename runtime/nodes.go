@@ -37,7 +37,18 @@ func handleDoctype(runtime *Runtime, doctype *html.Node) error {
 }
 
 func handleElement(runtime *Runtime, element *html.Node) error {
-	if err := handleOpeningTag(runtime, element); err != nil {
+	if isVoid, ok := voidElements[element.Data]; ok && isVoid {
+		return handleVoidElement(runtime, element)
+	}
+	return handleRegularElement(runtime, element)
+}
+
+func handleVoidElement(runtime *Runtime, element *html.Node) error {
+	return handleOpeningTag(runtime, element, true)
+}
+
+func handleRegularElement(runtime *Runtime, element *html.Node) error {
+	if err := handleOpeningTag(runtime, element, false); err != nil {
 		return err
 	}
 	if err := handleChildren(runtime, element); err != nil {
@@ -49,7 +60,7 @@ func handleElement(runtime *Runtime, element *html.Node) error {
 	return nil
 }
 
-func handleOpeningTag(runtime *Runtime, element *html.Node) error {
+func handleOpeningTag(runtime *Runtime, element *html.Node, selfClosing bool) error {
 	if err := runtime.print("<", element.Data); err != nil {
 		return err
 	}
@@ -57,6 +68,9 @@ func handleOpeningTag(runtime *Runtime, element *html.Node) error {
 		if err := runtime.print(" ", attr.Key, "=", "\"", attr.Val, "\""); err != nil {
 			return err
 		}
+	}
+	if selfClosing {
+		return runtime.print("/>")
 	}
 	return runtime.print(">")
 }
