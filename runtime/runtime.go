@@ -23,15 +23,15 @@ func (runtime *Runtime) RunCode(code io.Reader) error {
 	return runtime.eval(document)
 }
 
-type Handler func(runtime *Runtime, node *html.Node) error
-type Handlers map[html.NodeType]Handler
-
-var handlers Handlers = Handlers{}
-
 func (runtime *Runtime) eval(node *html.Node) error {
 	handler, ok := handlers[node.Type]
 	if !ok {
 		return fmt.Errorf("cannot handle node of type %d", node.Type)
 	}
 	return handler(runtime, node)
+}
+
+func (runtime *Runtime) print(args ...any) error {
+	_, err := fmt.Fprint(runtime.Output, args...)
+	return err
 }
