@@ -1,22 +1,27 @@
 package runtime
 
 import (
+	"bytes"
 	"strings"
 
 	"golang.org/x/net/html"
 )
 
 type Handler func(runtime *Runtime, node *html.Node) error
-type Handlers map[html.NodeType]Handler
 
-var handlers Handlers
+var handlers map[html.NodeType]Handler
+var special map[string]Handler
 
 func init() {
-	handlers = Handlers{
+	handlers = map[html.NodeType]Handler{
 		html.DocumentNode: handleChildren,
 		html.DoctypeNode:  handleDoctype,
 		html.ElementNode:  handleElement,
 		html.TextNode:     handleTextNode,
+	}
+
+	special = map[string]Handler{
+		"script": handleScript,
 	}
 }
 
@@ -37,6 +42,9 @@ func handleDoctype(runtime *Runtime, doctype *html.Node) error {
 }
 
 func handleElement(runtime *Runtime, element *html.Node) error {
+	if specialHandler, isSpecial := special[element.Data]; isSpecial {
+		return specialHandler(runtime, element)
+	}
 	if isVoid, ok := voidElements[element.Data]; ok && isVoid {
 		return handleVoidElement(runtime, element)
 	}
@@ -81,4 +89,18 @@ func handleClosingTag(runtime *Runtime, element *html.Node) error {
 
 func handleTextNode(runtime *Runtime, textNode *html.Node) error {
 	return runtime.print(strings.TrimSpace(textNode.Data))
+}
+
+func handleScript(runtime *Runtime, scriptElement *html.Node) error {
+	var buffer bytes.Buffer
+	output := runtime.Output
+	runtime.Output = &buffer
+	if err := handleChildren(runtime, scriptElement); err != nil {
+		return err
+	}
+	runtime.Output = output
+	if _, err := runtime.vm.RunString(buffer.String()); err != nil {
+		return err
+	}
+	return nil
 }

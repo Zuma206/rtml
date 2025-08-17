@@ -4,15 +4,19 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/dop251/goja"
 	"golang.org/x/net/html"
 )
 
 type Runtime struct {
 	Output io.Writer
+	vm     *goja.Runtime
 }
 
 func New() *Runtime {
-	return &Runtime{}
+	return &Runtime{
+		vm: goja.New(),
+	}
 }
 
 func (runtime *Runtime) RunCode(code io.Reader) error {
