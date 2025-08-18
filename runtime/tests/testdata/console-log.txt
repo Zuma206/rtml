@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+  <head></head>
+  <body>
+    <script>
+      console.log("Hello, World!");
+    </script>
+    <p>Done</p>
+  </body>
+</html>
+==========
+<!DOCTYPE html><html><head></head><body><p>Done</p></body></html>
+==========
+Hello, World!
