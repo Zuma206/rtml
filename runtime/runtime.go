@@ -3,22 +3,24 @@ package runtime
 import (
 	"fmt"
 	"io"
+	"os"
 
 	"github.com/dop251/goja"
-	"github.com/zuma206/rtml/stdlib"
 	"golang.org/x/net/html"
 )
 
 type Runtime struct {
-	Output io.Writer
-	vm     *goja.Runtime
+	Stream io.Writer
+	Log    io.Writer
+	VM     *goja.Runtime
 }
 
 func New() *Runtime {
 	runtime := &Runtime{
-		vm: goja.New(),
+		Stream: os.Stdout,
+		Log:    os.Stdout,
+		VM:     goja.New(),
 	}
-	stdlib.OpenStdlib(runtime.vm)
 	return runtime
 }
 
@@ -39,6 +41,6 @@ func (runtime *Runtime) eval(node *html.Node) error {
 }
 
 func (runtime *Runtime) print(args ...any) error {
-	_, err := fmt.Fprint(runtime.Output, args...)
+	_, err := fmt.Fprint(runtime.Stream, args...)
 	return err
 }

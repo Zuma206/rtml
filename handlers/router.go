@@ -24,7 +24,7 @@ func FromFileRouter(routes router.Router[string]) http.Handler {
 		defer file.Close()
 		rt.Lock()
 		defer rt.Unlock()
-		rt.Output = w
+		rt.Stream = w
 		if err := rt.RunCode(file); err != nil {
 			return err
 		}

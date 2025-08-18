@@ -1,7 +1,9 @@
 package stdlib
 
-import "github.com/dop251/goja"
+import (
+	"github.com/zuma206/rtml/runtime"
+)
 
-func OpenStdlib(vm *goja.Runtime) {
-	openConsole(vm)
+func OpenStdlib(rt *runtime.Runtime) {
+	openConsole(rt)
 }

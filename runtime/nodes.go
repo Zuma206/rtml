@@ -93,13 +93,13 @@ func handleTextNode(runtime *Runtime, textNode *html.Node) error {
 
 func handleScript(runtime *Runtime, scriptElement *html.Node) error {
 	var buffer bytes.Buffer
-	output := runtime.Output
-	runtime.Output = &buffer
+	output := runtime.Stream
+	runtime.Stream = &buffer
 	if err := handleChildren(runtime, scriptElement); err != nil {
 		return err
 	}
-	runtime.Output = output
-	if _, err := runtime.vm.RunString(buffer.String()); err != nil {
+	runtime.Stream = output
+	if _, err := runtime.VM.RunString(buffer.String()); err != nil {
 		return err
 	}
 	return nil
