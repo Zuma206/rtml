@@ -9,6 +9,7 @@ import (
 
 	"github.com/zuma206/rtml/router"
 	"github.com/zuma206/rtml/runtime"
+	"github.com/zuma206/rtml/stdlib"
 )
 
 func FromFileRouter(routes router.Router[string]) http.Handler {
@@ -16,6 +17,7 @@ func FromFileRouter(routes router.Router[string]) http.Handler {
 		*runtime.Runtime
 		*sync.Mutex
 	}{runtime.New(), &sync.Mutex{}}
+	stdlib.OpenStdlib(rt.Runtime)
 	return WithError(func(w http.ResponseWriter, r *http.Request) error {
 		file, err := lookupFile(routes, r.URL.Path)
 		if err != nil {
