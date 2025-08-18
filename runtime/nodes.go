@@ -21,7 +21,8 @@ func init() {
 	}
 
 	special = map[string]Handler{
-		"script": handleScript,
+		"script":   handleScript,
+		"template": handleSkip,
 	}
 }
 
@@ -102,5 +103,9 @@ func handleScript(runtime *Runtime, scriptElement *html.Node) error {
 	if _, err := runtime.VM.RunString(buffer.String()); err != nil {
 		return err
 	}
+	return nil
+}
+
+func handleSkip(_ *Runtime, _ *html.Node) error {
 	return nil
 }
