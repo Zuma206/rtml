@@ -1,0 +1,17 @@
+<script>
+  const name = "World";
+  function getNumber() {
+    return 0;
+  }
+  const details = {
+    address: {
+      street: "Downing Street",
+    },
+  };
+</script>
+<h1>Hello, ${name}</h1>
+<p>The number is: ${getNumber()}</p>
+<p>The street is: ${details.address.street}</p>
+==========
+<html><head></head><body><h1>Hello, World</h1><p>The number is: 0</p><p>The street is: Downing Street</p></body></html>
+==========

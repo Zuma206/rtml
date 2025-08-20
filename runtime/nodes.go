@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"strings"
 
+	"github.com/zuma206/rtml/streval"
 	"golang.org/x/net/html"
 )
 
@@ -89,7 +90,19 @@ func handleClosingTag(runtime *Runtime, element *html.Node) error {
 }
 
 func handleTextNode(runtime *Runtime, textNode *html.Node) error {
-	return runtime.print(strings.TrimSpace(textNode.Data))
+	trimmed := strings.TrimSpace(textNode.Data)
+	return streval.Parse(trimmed, streval.Handlers{
+		Literal: func(str string) error {
+			return runtime.print(str)
+		},
+		Expression: func(str string) error {
+			value, err := runtime.VM.RunString(str)
+			if err != nil {
+				return err
+			}
+			return runtime.print(value.String())
+		},
+	})
 }
 
 func handleScript(runtime *Runtime, scriptElement *html.Node) error {
