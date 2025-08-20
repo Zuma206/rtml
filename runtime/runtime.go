@@ -10,9 +10,10 @@ import (
 )
 
 type Runtime struct {
-	Stream io.Writer
-	Log    io.Writer
-	VM     *goja.Runtime
+	Stream    io.Writer
+	Log       io.Writer
+	VM        *goja.Runtime
+	Templates Templates
 }
 
 func New() *Runtime {
@@ -25,14 +26,16 @@ func New() *Runtime {
 }
 
 func (runtime *Runtime) RunCode(code io.Reader) error {
+	runtime.Templates = Templates{}
 	document, err := html.Parse(code)
 	if err != nil {
 		return err
 	}
-	return runtime.eval(document)
+	runtime.Templates.Scan(document)
+	return runtime.Eval(document)
 }
 
-func (runtime *Runtime) eval(node *html.Node) error {
+func (runtime *Runtime) Eval(node *html.Node) error {
 	handler, ok := handlers[node.Type]
 	if !ok {
 		return fmt.Errorf("cannot handle node of type %d", node.Type)

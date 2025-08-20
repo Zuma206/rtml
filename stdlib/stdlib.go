@@ -6,4 +6,5 @@ import (
 
 func OpenStdlib(rt *runtime.Runtime) {
 	openConsole(rt)
+	openTempl(rt)
 }

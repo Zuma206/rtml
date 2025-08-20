@@ -28,7 +28,7 @@ func init() {
 
 func handleChildren(runtime *Runtime, node *html.Node) error {
 	for child := range node.ChildNodes() {
-		if err := runtime.eval(child); err != nil {
+		if err := runtime.Eval(child); err != nil {
 			return err
 		}
 	}
